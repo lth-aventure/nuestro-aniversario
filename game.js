@@ -30,9 +30,9 @@
 
 const CONFIG = {
   // --- Nombres y fecha ---
-  miNombre: "TU NOMBRE",
-  nombrePareja: "SU NOMBRE",
-  fechaAniversario: "2025-01-01",   // AAAA-MM-DD (sirve para calcular "días juntos" en el final)
+  miNombre: "LISETH",
+  nombrePareja: "ELOY",
+  fechaAniversario: "2025-09-20",   // AAAA-MM-DD (sirve para calcular "días juntos" en el final)
 
   // --- Pantalla de inicio ---
   tituloInicio: "NUEVA AVENTURA",
@@ -40,7 +40,7 @@ const CONFIG = {
   textoBotonInicio: "COMENZAR AVENTURA",
 
   // --- Comportamiento ---
-  mostrarAyudas: true,              // true = muestra en pantalla qué archivo agregar; false = las oculta
+  mostrarAyudas: false,             // true = muestra en pantalla qué archivo agregar; false = las oculta (déjalo en false para el regalo final)
   efectosPorDefecto: true,          // sonidos cortos (clics, pasos, recuerdos)
   musicaPorDefecto: true,           // melodía suave de fondo (se puede apagar con el botón 🎵)
   musicaFondo: "",                  // "" = melodía chiptune original generada por el navegador.
@@ -129,20 +129,23 @@ const TEXTOS = {
 // --- ZONAS ---
 // Cada zona tiene su nombre (etiqueta del mapa), sus diálogos (una frase por cada
 // toque del jugador), y las rutas de imágenes de su escena.
+// Las fotos están en assets/recuerdos/ y assets/lugares/ (formato .jpg).
 const ZONAS = {
   // ---------- 1. COLEGIO ----------
   colegio: {
     nombre: "Colegio",
-    imagen: "assets/lugares/colegio.png",          // ilustración pixel-art del colegio (opcional)
-    foto: "assets/recuerdos/foto-colegio.png",     // fotografía (opcional)
-    objeto: { imagen: "assets/objetos/colegio.png", nombre: "Objeto de ese día" }, // p. ej. una nota, un cuaderno...
-    tituloLibreta: "Nuestro primer encuentro",
+    imagen: "assets/lugares/colegio.png",          // ilustración pixel-art del colegio (opcional; si no existe se usa el dibujo automático)
+    foto: "assets/recuerdos/foto-colegio.jpg",     // fotografía
+    fotoLeyenda: "Juntos",                         // texto bajo la foto ("" = sin texto)
+    objeto: { imagen: "assets/recuerdos/colegio-2.jpg", nombre: "En clases" }, // segunda foto
+    tituloLibreta: "Nuestros días de colegio",
     notaLibreta: "Siempre tú y yo ♥",
     dialogos: [
       "Aquí empezó todo...",
-      // REEMPLAZAR CON NUESTRO RECUERDO REAL
-      "[REEMPLAZAR] Cuenta aquí cómo se conocieron: dónde estaban, qué pasó y qué pensaste de esa persona ese día.",
-      "Nadie imaginaba que ese día era el comienzo de una gran aventura."
+      "Somos del mismo grupo de amigos, y sin darme cuenta, poco a poco fui descubriendo en ti a alguien en quien confiar.",
+      "Alguien con quien podía hablar de cualquier tema, que no me presionaba y que se preocupaba por mí.",
+      "Entre recomendaciones de pelis y anécdotas personales, nos fuimos conociendo poco a poco.",
+      "Y así, sin prisa, empezó nuestra aventura."
     ]
   },
 
@@ -150,17 +153,18 @@ const ZONAS = {
   primeros: {
     nombre: "Primeros meses",
     imagen: "assets/lugares/primeros-meses.png",
-    foto: "assets/recuerdos/foto-primeros-meses.png",
+    foto: "assets/recuerdos/foto-primeros-meses.jpg",
+    fotoLeyenda: "Nuestras ocurrencias",
     tituloLibreta: "Cuando todo comenzó",
     momentos: [
-      "[REEMPLAZAR] Nuestra primera salida",
-      "[REEMPLAZAR] Algo que nos hizo reír muchísimo",
-      "[REEMPLAZAR] Un momento que no quiero olvidar"
+      "Nuestra primera salida: esa mañana de básquet, cuando sin pensarlo fuimos solo tú y yo, con la tensión del momento.",
+      "Las ocurrencias de los dos nos hacían reír muchísimo: comentarios y acciones espontáneas. Siempre nos hemos hecho reír juntos.",
+      "Algo que no quiero olvidar: que viniste por Navidad y Año Nuevo, y ese día se volvió aún más significativo."
     ],
     dialogos: [
       "Empezamos a conocernos, a compartir risas, locuras y pequeños momentos que se volvieron grandes.",
-      // REEMPLAZAR CON NUESTRO RECUERDO REAL
-      "[REEMPLAZAR] Aquí puedes escribir cómo se sintieron los primeros meses de la relación."
+      "Las ocurrencias mutuas nos hacían reír muchísimo, y eso no ha cambiado.",
+      "Y cuando viniste por Navidad y Año Nuevo, ese día se volvió aún más significativo."
     ]
   },
 
@@ -206,81 +210,144 @@ const ZONAS = {
 // --- NUESTROS LUGARES ---
 // Agrega, quita o edita lugares a tu gusto: el mapa se reorganiza solo.
 //   nombre      → título del lugar
-//   imagen      → boceto/imagen (assets/lugares/...). Si no existe, se muestra un dibujo automático
-//   arte        → dibujo automático de reemplazo: "parque" | "cafe" | "ciudad" | "mirador" | "plaza" | "atardecer"
+//   imagen      → foto o dibujo (assets/lugares/...). Si no existe, se muestra un dibujo automático
+//   arte        → dibujo automático de reemplazo: "parque" | "cafe" | "ciudad" | "casa" | "plaza" | "mirador" | "atardecer"
+//   foco        → opcional: qué parte de la foto se ve al recortarla, "x% y%" (p. ej. "50% 75%" = centro, abajo)
 //   fecha       → opcional (déjala "" si no quieres mostrarla)
 //   descripcion → cómo es el lugar
-//   recuerdo    → el recuerdo escrito (se muestra como diálogo)
+//   recuerdo    → el recuerdo escrito: un texto, o varios textos entre corchetes (cada uno es una "página" de diálogo)
 //   x, y        → opcional: posición del punto en el mapa, de 0 a 100 (si no las pones, se acomodan solas)
 const LUGARES = [
   {
-    nombre: "Lugar 1 · Parque",
-    imagen: "assets/lugares/lugar1.png",
+    nombre: "Parque",
+    imagen: "assets/lugares/lugar1.jpg",
+    foco: "50% 50%",
     arte: "parque",
-    fecha: "Fecha",
-    descripcion: "[REEMPLAZAR] Describe cómo es este lugar.",
-    recuerdo: "[REEMPLAZAR] Nuestro recuerdo en este lugar..."
+    fecha: "16/03/2026",
+    descripcion: "Siempre ha sido nuestra opción: planes tranquilos y lindos en diferentes parques.",
+    recuerdo: [
+      "La vez que recolectamos florcitas, con la tensión de que no nos vieran.",
+      "La vez que caminábamos en San Andrés y te dije que no mucho besito por los niños y las familias.",
+      "Y las veces que solo paseábamos juntos, conversando de cualquier tema. Se sintió tan cotidiano y familiar."
+    ]
   },
   {
-    nombre: "Lugar 2 · Cafetería",
-    imagen: "assets/lugares/lugar2.png",
+    nombre: "Cafetería",
+    imagen: "assets/lugares/lugar2.jpg",
+    foco: "50% 45%",
     arte: "cafe",
-    fecha: "Fecha",
-    descripcion: "[REEMPLAZAR] Describe cómo es este lugar.",
-    recuerdo: "[REEMPLAZAR] Nuestro recuerdo en este lugar..."
+    fecha: "14/02/2026",
+    descripcion: "No hemos tenido una cafetería fija, pero no hay mejor combinación que un frapuccino y la persona que amo.",
+    recuerdo: [
+      "Siempre valoro el hecho de que me invites. Es un equilibrio perfecto: tomar algo frío y sentir tu calidez.",
+      "Espero que en el futuro tengamos un solo lugar, hasta el punto de que nos conozcan y nos digan “¿lo de siempre?” Jaja, sería muy tierno."
+    ]
   },
   {
-    nombre: "Lugar 3 · Centro comercial",
-    imagen: "assets/lugares/lugar3.png",
+    nombre: "Centro comercial",
+    imagen: "assets/lugares/lugar3.jpg",
+    foco: "50% 40%",
     arte: "ciudad",
-    fecha: "Fecha",
-    descripcion: "[REEMPLAZAR] Describe cómo es este lugar.",
-    recuerdo: "[REEMPLAZAR] Nuestro recuerdo en este lugar..."
+    fecha: "04/04/2026",
+    descripcion: "Nuestro viaje confiable cuando no sabemos a dónde ir.",
+    recuerdo: [
+      "Lo siento como esas misiones secundarias: entramos a ver cosas sabiendo que no compraremos, o solo por curiosear.",
+      "La vez que elegimos la ropa para el otro, o la vez que fuimos y recién estaban abriendo el mall, jaja. Me acuerdo de cada detalle."
+    ]
   },
   {
-    nombre: "Lugar 4 · Mirador",
-    imagen: "assets/lugares/lugar4.png",
-    arte: "mirador",
-    fecha: "Fecha",
-    descripcion: "[REEMPLAZAR] Describe cómo es este lugar.",
-    recuerdo: "[REEMPLAZAR] Nuestro recuerdo en este lugar..."
+    nombre: "Mi casa",
+    imagen: "assets/lugares/lugar4.jpg",
+    foco: "50% 45%",
+    arte: "casa",
+    fecha: "26/02/2026",
+    descripcion: "Muchos de nuestros encuentros sucedieron aquí.",
+    recuerdo: [
+      "Te presenté formalmente a mis papás, grabamos TikToks, vimos Netflix, cocinamos, cenamos, te maquillé.",
+      "Siempre te he abierto las puertas de mi hogar y lo seguiré haciendo."
+    ]
   },
   {
-    nombre: "Lugar 5 · Plaza",
-    imagen: "assets/lugares/lugar5.png",
+    nombre: "Plaza · Centro de Trujillo",
+    imagen: "assets/lugares/lugar5.jpg",
+    foco: "50% 75%",
     arte: "plaza",
-    fecha: "Fecha",
-    descripcion: "[REEMPLAZAR] Describe cómo es este lugar.",
-    recuerdo: "[REEMPLAZAR] Nuestro recuerdo en este lugar..."
+    fecha: "16/01/2026",
+    descripcion: "El centro de Trujillo guarda uno de mis mejores recuerdos.",
+    recuerdo: [
+      "La vez que, pese a la lluvia, aun así fuimos. Se sintió tan nostálgico y romántico.",
+      "Jaja, espero que aún recuerdes a la señora que nos tomó unas fotos en la plaza."
+    ]
   },
   {
-    nombre: "Lugar 6 · Un lugar especial",
-    imagen: "assets/lugares/lugar6.png",
+    nombre: "Un lugar especial",
+    imagen: "",
     arte: "atardecer",
     fecha: "",
-    descripcion: "[REEMPLAZAR] Describe cómo es este lugar.",
-    recuerdo: "[REEMPLAZAR] Nuestro recuerdo en este lugar..."
+    descripcion: "Un lugar que todavía no hemos elegido.",
+    recuerdo: [
+      "Creo que cualquier lugar, mientras esté contigo, lo es.",
+      "Quizás lo elijamos con el tiempo y las circunstancias: un lugar donde podamos decir que es de nosotros ♥, tranquilo y lleno de amor."
+    ]
   }
 ];
 
 // --- BANDA SONORA ---
 // Cada canción se asocia a un recuerdo. NO incluyas archivos de audio con copyright:
 // usa enlaces legales a plataformas.
+//   frase                     → (opcional) una frase corta de la canción que quieras destacar.
+//                               Escríbela entre las comillas y se mostrará en la pantallita del
+//                               reproductor. Ejemplo:  frase: "aquí va tu frase favorita",
+//                               ("" = no se muestra nada)
+//   recuerdo                  → un texto, o varios entre corchetes (cada uno es una "página")
 //   spotify / youtube / apple → enlace a la canción ("" = todavía sin enlace)
-//   embed                     → (opcional) enlace de "insertar" de Spotify o YouTube, p. ej.
+//   embed                     → reproductor incrustado de Spotify o YouTube (botón ▶), p. ej.
 //                               "https://open.spotify.com/embed/track/ID_DE_LA_CANCION"
 //                               "https://www.youtube.com/embed/ID_DEL_VIDEO"
 const CANCIONES = [
-  { titulo: "Canción 1", artista: "Artista", fecha: "", recuerdo: "[REEMPLAZAR] Esta canción me recuerda a...", spotify: "", youtube: "", apple: "", embed: "" },
-  { titulo: "Canción 2", artista: "Artista", fecha: "", recuerdo: "[REEMPLAZAR] Esta canción me recuerda a...", spotify: "", youtube: "", apple: "", embed: "" },
-  { titulo: "Canción 3", artista: "Artista", fecha: "", recuerdo: "[REEMPLAZAR] Esta canción me recuerda a...", spotify: "", youtube: "", apple: "", embed: "" },
-  { titulo: "Canción 4", artista: "Artista", fecha: "", recuerdo: "[REEMPLAZAR] Esta canción me recuerda a...", spotify: "", youtube: "", apple: "", embed: "" },
-  { titulo: "Canción 5", artista: "Artista", fecha: "", recuerdo: "[REEMPLAZAR] Esta canción me recuerda a...", spotify: "", youtube: "", apple: "", embed: "" }
+  {
+    titulo: "Eres Tú", artista: "Carla Morrison", fecha: "",
+    recuerdo: ["Creo que esta canción plasma muy bien lo que siento y pienso...", "Disfruto tanto de quererte."],
+    frase: "",
+    spotify: "https://open.spotify.com/track/684OHgFXO1l3To5pNZlyyl", youtube: "", apple: "",
+    embed: "https://open.spotify.com/embed/track/684OHgFXO1l3To5pNZlyyl"
+  },
+  {
+    titulo: "Bésame (Cnt. 1:1)", artista: "Darviin", fecha: "",
+    recuerdo: ["Un año juntos gracias a los planes de Dios, que me mandó a un chico tan dulce.", "Un gesto tan pequeño como un beso convierte mi día por completo."],
+    frase: "",
+    spotify: "https://open.spotify.com/track/1nRRT4Tx2LTuDlyqut5h1C", youtube: "", apple: "",
+    embed: "https://open.spotify.com/embed/track/1nRRT4Tx2LTuDlyqut5h1C"
+  },
+  {
+    titulo: "Un año", artista: "Sebastián Yatra y Reik", fecha: "",
+    recuerdo: ["Sé que la distancia es difícil, y te agradezco por tu paciencia y resiliencia.", "Sé que estos meses no han sido fáciles, pero gracias por quedarte."],
+    frase: "",
+    spotify: "https://open.spotify.com/track/5BDP2tky8oMQJPS33frKVp", youtube: "", apple: "",
+    embed: "https://open.spotify.com/embed/track/5BDP2tky8oMQJPS33frKVp"
+  },
+  {
+    titulo: "City of Stars", artista: "Ryan Gosling", fecha: "",
+    recuerdo: [
+      "Más allá de que vimos esta película que tanto guardé, refleja perfectamente el miedo y la emoción de no saber qué pasará después...",
+      "Me recuerda que, aunque no sepamos qué pasará con la distancia, lo que iniciamos juntos vale la pena."
+    ],
+    frase: "",
+    spotify: "https://open.spotify.com/track/5BMwpS4iYKR30kq9U9beaT", youtube: "", apple: "",
+    embed: "https://open.spotify.com/embed/track/5BMwpS4iYKR30kq9U9beaT"
+  },
+  {
+    titulo: "Nothing", artista: "Bruno Major", fecha: "",
+    recuerdo: ["Todo, por más simple que parezca, si es contigo es más que suficiente."],
+    frase: "",
+    spotify: "https://open.spotify.com/track/1lORkxEMmsCZqhoxcmk3A3", youtube: "", apple: "",
+    embed: "https://open.spotify.com/embed/track/1lORkxEMmsCZqhoxcmk3A3"
+  }
 ];
 
 // --- UNIVERSIDAD ---
 // Cada sección es una pestaña. "arte" es el dibujo automático de reemplazo:
-// "universidad" | "atardecer" | "distancia" | "noche"
+// "universidad" | "atardecer" | "distancia" | "noche" | "mensajes"
 const UNIVERSIDAD = {
   secciones: [
     {
@@ -288,20 +355,20 @@ const UNIVERSIDAD = {
       arte: "universidad", imagen: "assets/lugares/universidad.png",
       dialogo: "Esta es nuestra etapa actual: nuevos retos, nuevos horarios y las mismas ganas de compartirlo todo.",
       items: [
-        "[REEMPLAZAR] Un recuerdo de esta etapa",
-        "[REEMPLAZAR] Otro momento de estos días",
-        "[REEMPLAZAR] Algo pequeño que me hizo feliz"
+        "Contarnos nuestro día y lo que pasa.",
+        "Decir repetitivamente hola en llamada.",
+        "Probar filtros raros en videollamada."
       ],
-      fotos: ["assets/recuerdos/universidad-1.png"]
+      fotos: ["assets/recuerdos/universidad-1.jpg"]
     },
     {
       icono: "❤️", titulo: "Admiro",
       arte: "atardecer", imagen: "",
       dialogo: "Cosas que admiro de ti:",
       items: [
-        "[REEMPLAZAR] Tu forma de pensar",
-        "[REEMPLAZAR] Tu esfuerzo",
-        "[REEMPLAZAR] Cómo me haces sentir"
+        "Tu apertura para probar cosas nuevas gracias a mis consejos.",
+        "Tu paciencia infinita cuando mis emociones se vuelven un enredo.",
+        "Cómo siempre buscas orientar y ayudar a los demás."
       ],
       fotos: []
     },
@@ -310,19 +377,19 @@ const UNIVERSIDAD = {
       arte: "distancia", imagen: "",
       dialogo: "La distancia no cambia lo que siento; solo hace que valore más cada momento juntos.",
       items: [
-        "[REEMPLAZAR] Una dificultad que superamos",
-        "[REEMPLAZAR] Algo que aprendimos de la distancia"
+        "Aprendí, a la distancia, a conversar las cosas por más pequeñas que parezcan o por más que quiera huir.",
+        "Superamos juntos malentendidos por chat y la percepción de interpretar algo diferente."
       ],
       fotos: []
     },
     {
       icono: "💌", titulo: "Mensajes",
-      arte: "noche", imagen: "",
+      arte: "mensajes", imagen: "",
       dialogo: "Pequeños mensajes para leer cuando quieras:",
       items: [
-        "[REEMPLAZAR] Mensaje 1",
-        "[REEMPLAZAR] Mensaje 2",
-        "[REEMPLAZAR] Mensaje 3"
+        "Que tu miopía solo me enfoque a mí.",
+        "Te quiero encima, no lejos de mí.",
+        "Quisiera ser sartén para que me estrelles tus huevos, digo que..."
       ],
       fotos: []
     }
@@ -356,16 +423,16 @@ const PROXIMA_RUTA = {
 //   x, y   → posición del destello dentro de la escena (0 a 100)
 // Puedes agregar o quitar recuerdos: el contador y el progreso se ajustan solos.
 const RECUERDOS = [
-  { id: "r-colegio-1",     zona: "colegio",     tipo: "recuerdo", titulo: "El primer hola",       texto: "[REEMPLAZAR] Aquí va el recuerdo del primer día que hablamos.", x: 14, y: 52 },
-  { id: "r-colegio-2",     zona: "colegio",     tipo: "foto",     titulo: "Foto del colegio",     texto: "[REEMPLAZAR] Describe una foto de esa época.",                  x: 90, y: 78 },
-  { id: "r-primeros-1",    zona: "primeros",    tipo: "mensaje",  titulo: "Nota secreta",         texto: "[REEMPLAZAR] Un mensaje de los primeros meses.",                x: 10, y: 60 },
-  { id: "r-primeros-2",    zona: "primeros",    tipo: "especial", titulo: "Momento especial",     texto: "[REEMPLAZAR] Un momento que marcó los primeros meses.",         x: 78, y: 50 },
-  { id: "r-lugares-1",     zona: "lugares",     tipo: "entrada",  titulo: "Entrada guardada",     texto: "[REEMPLAZAR] Una entrada, ticket o plan que hicieron juntos.",  x: 93, y: 10 },
-  { id: "r-lugares-2",     zona: "lugares",     tipo: "foto",     titulo: "Foto de un lugar",     texto: "[REEMPLAZAR] Una foto de alguno de los lugares.",               x: 7,  y: 90 },
-  { id: "r-banda-1",       zona: "banda",       tipo: "cancion",  titulo: "Nuestra canción",      texto: "[REEMPLAZAR] La canción que más nos representa.",               x: 90, y: 14 },
-  { id: "r-universidad-1", zona: "universidad", tipo: "mensaje",  titulo: "Carta a la distancia", texto: "[REEMPLAZAR] Un mensaje para los días en que estamos lejos.",   x: 8,  y: 22 },
-  { id: "r-universidad-2", zona: "universidad", tipo: "especial", titulo: "Lo que admiro",        texto: "[REEMPLAZAR] Algo que admiro mucho de ti.",                     x: 92, y: 84 },
-  { id: "r-proxima-1",     zona: "proxima",     tipo: "recuerdo", titulo: "Semilla del futuro",   texto: "Un recuerdo que todavía no existe... pero que ya tiene lugar en la mochila.", x: 50, y: 30 }
+  { id: "r-colegio-1",     zona: "colegio",     tipo: "recuerdo", titulo: "Donde empezó todo",   texto: "Del mismo grupo de amigos, poco a poco descubrí en ti a alguien en quien confiar. Ahí empezó todo.", x: 14, y: 52 },
+  { id: "r-colegio-2",     zona: "colegio",     tipo: "foto",     titulo: "Fotos del colegio",   texto: "Dos fotos de nuestros días de colegio, antes de ser lo que somos hoy.", x: 90, y: 78 },
+  { id: "r-primeros-1",    zona: "primeros",    tipo: "mensaje",  titulo: "Primera salida",      texto: "Esa mañana de básquet, sin pensarlo, solo tú y yo, con la tensión del momento.", x: 10, y: 60 },
+  { id: "r-primeros-2",    zona: "primeros",    tipo: "especial", titulo: "Navidad y Año Nuevo", texto: "Viniste por Navidad y Año Nuevo, y ese día se volvió aún más significativo.", x: 78, y: 50 },
+  { id: "r-lugares-1",     zona: "lugares",     tipo: "entrada",  titulo: "Misión secundaria",   texto: "Entrar a ver cosas sabiendo que no compraremos, solo por curiosear. Contigo, hasta eso es un plan.", x: 93, y: 10 },
+  { id: "r-lugares-2",     zona: "lugares",     tipo: "foto",     titulo: "La señora de la plaza", texto: "El centro de Trujillo, la lluvia y la señora que nos tomó unas fotos en la plaza.", x: 7,  y: 90 },
+  { id: "r-banda-1",       zona: "banda",       tipo: "cancion",  titulo: "Nuestra banda sonora", texto: "Cada canción de esta lista guarda un pedacito de lo que siento por ti.", x: 90, y: 14 },
+  { id: "r-universidad-1", zona: "universidad", tipo: "mensaje",  titulo: "Hola, otra vez hola", texto: "Decir hola una y otra vez en llamada: así te tengo cerca aunque estemos lejos.", x: 8,  y: 22 },
+  { id: "r-universidad-2", zona: "universidad", tipo: "especial", titulo: "Lo que admiro",       texto: "Tu paciencia infinita cuando mis emociones se vuelven un enredo.", x: 92, y: 84 },
+  { id: "r-proxima-1",     zona: "proxima",     tipo: "recuerdo", titulo: "Semilla del futuro",  texto: "Un recuerdo que todavía no existe... pero que ya tiene lugar en la mochila.", x: 50, y: 30 }
 ];
 
 // --- FINAL ---
@@ -373,9 +440,9 @@ const FINAL = {
   titulo: "¡AVENTURA COMPLETADA!",
   subtitulo: "1 AÑO JUNTOS",
   // Cada elemento es una "página" de diálogo que aparece letra por letra.
-  // Para escribir más páginas, agrega más textos separados por comas.
   mensaje: [
-    "[ESCRIBIR AQUÍ EL MENSAJE FINAL]"
+    "Gracias por estos maravillosos 365 días a tu lado, mi bonboncito.",
+    "La distancia impide besarnos, pero no amarnos."
   ],
   pregunta: "¿LISTO PARA LA SIGUIENTE AVENTURA?",
   textoBoton: "CONTINUAR",
@@ -919,6 +986,16 @@ const Arte = {
       patron(g, PAT.interrogacion, 72, 36, "#c9b8ff", 3);
     },
 
+    mensajes(g) {
+      cielo(g, ["#0f0b26", "#171040", "#211757", "#2d1f6b"], AH);
+      estrellas(g, 38, 9, 70);
+      colinas(g, "#1f1838", 80, 4, 1.1);
+      R(g, "#fff6e3", 52, 28, 56, 38); R(g, "#e8d6b0", 52, 28, 56, 2); R(g, "#cbb58a", 52, 64, 56, 2);
+      for (let i = 0; i < 28; i++) { R(g, "#d9c39a", 52 + i, 30 + Math.round(i * 0.8), 1, 2); R(g, "#d9c39a", 107 - i, 30 + Math.round(i * 0.8), 1, 2); }
+      patron(g, PAT.corazon, 73, 42, "#e8657a", 2);
+      patron(g, PAT.estrella, 28, 22, "#ffd77a"); patron(g, PAT.estrella, 126, 30, "#ffd77a");
+    },
+
     parque(g) {
       cielo(g, ["#88d0f2", "#a6dcf3", "#c6e9ee", "#eaf1de"], 58);
       disco(g, "#fff3a6", 128, 16, 8); nube(g, 20, 18); nube(g, 70, 30);
@@ -961,6 +1038,17 @@ const Arte = {
       R(g, "#8a5a3a", 66, 66, 26, 3); R(g, "#5f3d20", 78, 69, 3, 12);
       R(g, "#fff6e3", 74, 60, 8, 6); R(g, "#7a4f36", 75, 61, 6, 2); R(g, "#fff6e3", 82, 61, 2, 3);
       R(g, "rgba(255,255,255,.8)", 76, 55, 1, 3); R(g, "rgba(255,255,255,.8)", 79, 53, 1, 4);
+    },
+
+    casa(g) {
+      cielo(g, ["#f7b58a", "#f9cc99", "#fbe1ab", "#fdeec4"], 60);
+      nube(g, 18, 16); nube(g, 116, 26);
+      colinas(g, "#8ccc8a", 60, 3, 1.3);
+      R(g, "#95d66f", 0, 62, AW, 34);
+      camino(g, "#ecd6a0", 66, AH, 80, 8, 0.8);
+      edificioPx(g, 48, 26, 64, 42, { techo: "#c0674f", pared: "#fff0d6", doorX: 32, extra: "corazon" });
+      arbol(g, 20, 82, 30, "#e57ba0", "#f7a9c4"); arbol(g, 142, 80, 28);
+      flores(g, 108, 86, 6, 7); flores(g, 30, 90, 4, 8);
     },
 
     plaza(g) {
@@ -1633,7 +1721,7 @@ function construirEscena(id) {
 /* ---- Piezas reutilizables ---- */
 
 /** Dibuja el arte automático y, si existe, lo reemplaza por tu imagen PNG */
-function rellenarArte(cont, arte, src, vigente) {
+function rellenarArte(cont, arte, src, vigente, alCargar) {
   cont.replaceChildren();
   const cv = document.createElement("canvas");
   cv.width = AW; cv.height = AH; cv.className = "visual-arte";
@@ -1644,6 +1732,7 @@ function rellenarArte(cont, arte, src, vigente) {
   cargarImagen(src).then(ok => {
     if (!ok || (vigente && !vigente())) return;
     const i = new Image();
+    if (alCargar) i.onload = () => alCargar(i);
     i.src = src; i.alt = ""; i.className = "visual-arte"; i.draggable = false;
     cont.replaceChildren(i);
   });
@@ -1669,7 +1758,7 @@ function pintarFondo(v, arte, imagen) {
 }
 
 /** Imagen con recuadro de aviso si el archivo todavía no existe */
-function crearImagen(src, clase, icono, texto) {
+function crearImagen(src, clase, icono, texto, alCargar) {
   const cont = el("div", "img-caja " + (clase || ""));
   const ph = el("div", "placeholder");
   ph.append(el("span", "ph-icono", icono || "🖼️"), el("span", "ph-texto ayuda", texto || "AGREGAR IMAGEN:"), el("span", "ph-ruta ayuda", src));
@@ -1677,20 +1766,29 @@ function crearImagen(src, clase, icono, texto) {
   cargarImagen(src).then(ok => {
     if (!ok) return;
     const i = new Image();
+    if (alCargar) i.onload = () => alCargar(i);
     i.src = src; i.alt = ""; i.draggable = false;
     cont.replaceChildren(i);
   });
   return cont;
 }
+/** Ajusta la proporción del marco a la foto (sin cortar demasiado) */
+function ajustarProporcion(caja, img, minimo, maximo) {
+  if (!img.naturalWidth) return;
+  const r = img.naturalWidth / img.naturalHeight;
+  caja.style.aspectRatio = String(Math.max(minimo, Math.min(maximo, r)));
+}
 function crearFoto(src, leyenda) {
   const f = el("figure", "polaroid");
-  f.append(crearImagen(src, "polaroid-marco", "📷", "AGREGAR FOTO:"));
+  const marco = crearImagen(src, "polaroid-marco", "📷", "AGREGAR FOTO:", img => ajustarProporcion(marco, img, 0.75, 1.4));
+  f.append(marco);
   if (leyenda) f.append(el("figcaption", "polaroid-leyenda", leyenda));
   return f;
 }
 function crearObjeto(obj) {
   const f = el("figure", "polaroid objeto");
-  f.append(crearImagen(obj.imagen, "polaroid-marco", "🎟️", "AGREGAR OBJETO:"), el("figcaption", "polaroid-leyenda", obj.nombre));
+  const marco = crearImagen(obj.imagen, "polaroid-marco", "🎟️", "AGREGAR OBJETO:", img => ajustarProporcion(marco, img, 0.75, 1.4));
+  f.append(marco, el("figcaption", "polaroid-leyenda", obj.nombre));
   return f;
 }
 
@@ -1717,7 +1815,7 @@ function renderColegio(c) {
   colocarBrillos(visual, "colegio");
   const libreta = el("div", "libreta caja");
   const fila = el("div", "libreta-fila");
-  fila.append(crearFoto(cfg.foto, "Foto"), crearObjeto(cfg.objeto));
+  fila.append(crearFoto(cfg.foto, cfg.fotoLeyenda || ""), crearObjeto(cfg.objeto));
   libreta.append(el("h3", "libreta-titulo", cfg.tituloLibreta), fila, el("p", "libreta-nota", sustituir(cfg.notaLibreta)));
   cuerpo.append(visual, libreta);
   dlg.decir(cfg.dialogos);
@@ -1731,7 +1829,7 @@ function renderPrimeros(c) {
   const libreta = el("div", "libreta caja");
   const ul = el("ul", "lista-check");
   cfg.momentos.forEach(m => ul.append(el("li", "", sustituir(m))));
-  libreta.append(el("h3", "libreta-titulo", cfg.tituloLibreta), ul, crearFoto(cfg.foto, "Foto"));
+  libreta.append(el("h3", "libreta-titulo", cfg.tituloLibreta), ul, crearFoto(cfg.foto, cfg.fotoLeyenda || ""));
   cuerpo.append(visual, libreta);
   dlg.decir(cfg.dialogos);
 }
@@ -1794,7 +1892,11 @@ function renderLugares(c) {
     juego.lugaresVistos[actual] = true;
     guardarPartida();
     const nuevaImg = el("div", "ficha-imagen img-caja pop");
-    rellenarArte(nuevaImg, l.arte, l.imagen, () => document.contains(nuevaImg));
+    rellenarArte(nuevaImg, l.arte, l.imagen, () => document.contains(nuevaImg), img => {
+      nuevaImg.classList.add("foto");
+      ajustarProporcion(nuevaImg, img, 0.85, 1.78);
+      img.style.objectPosition = l.foco || "50% 35%";
+    });
     fImg.replaceWith(nuevaImg);
     fImg = nuevaImg;
     fNombre.textContent = sustituir(l.nombre);
@@ -1802,7 +1904,9 @@ function renderLugares(c) {
     fFecha.hidden = !l.fecha;
     fDesc.textContent = sustituir(l.descripcion || "");
     $(".ficha-cuenta", nav).textContent = actual + 1 + " / " + n;
-    dlg.decir([l.recuerdo]);
+    dlg.decir(Array.isArray(l.recuerdo) ? l.recuerdo : [l.recuerdo]);
+    // lleva la vista a la ficha (foto + texto) del lugar elegido
+    if (ficha.scrollIntoView) ficha.scrollIntoView({ behavior: movimientoReducido ? "auto" : "smooth", block: "start" });
   }
   ant.addEventListener("click", () => elegir(actual < 0 ? n - 1 : actual - 1));
   sig.addEventListener("click", () => elegir(actual + 1));
@@ -1819,10 +1923,10 @@ function renderBanda(c) {
 
   const rep = el("div", "visual reproductor");
   const lcd = el("div", "lcd");
-  const lPista = el("span", "lcd-pista"), lTitulo = el("strong", "lcd-titulo"), lArtista = el("span", "lcd-artista");
+  const lPista = el("span", "lcd-pista"), lTitulo = el("strong", "lcd-titulo"), lArtista = el("span", "lcd-artista"), lFrase = el("em", "lcd-frase");
   const eq = el("div", "ecualizador");
   for (let i = 0; i < 7; i++) eq.append(document.createElement("i"));
-  lcd.append(lPista, lTitulo, lArtista, eq);
+  lcd.append(lPista, lTitulo, lArtista, lFrase, eq);
   const controles = el("div", "controles");
   const bPrev = el("button", "boton boton-control", "⏮"), bPlay = el("button", "boton boton-control boton-oro", "▶"), bNext = el("button", "boton boton-control", "⏭");
   bPrev.setAttribute("aria-label", "Pista anterior"); bPlay.setAttribute("aria-label", "Reproducir"); bNext.setAttribute("aria-label", "Pista siguiente");
@@ -1851,6 +1955,8 @@ function renderBanda(c) {
     lPista.textContent = "PISTA " + (actual + 1) + "/" + CANCIONES.length + (t.fecha ? "  ·  " + t.fecha : "");
     lTitulo.textContent = sustituir(t.titulo);
     lArtista.textContent = t.artista;
+    lFrase.textContent = t.frase ? "“" + sustituir(t.frase) + "”" : "";   // frase destacada (opcional)
+    lFrase.hidden = !t.frase;
     // enlaces legales (solo aparecen los que hayas escrito en CANCIONES)
     enlaces.replaceChildren();
     [["spotify", "SPOTIFY"], ["youtube", "YOUTUBE"], ["apple", "APPLE MUSIC"]].forEach(([k, nombre]) => {
@@ -1860,7 +1966,7 @@ function renderBanda(c) {
       enlaces.append(a);
     });
     if (!enlaces.children.length) enlaces.append(el("span", "enlaces-vacio ayuda", "🔗 Sin enlace todavía: agrega spotify / youtube / apple en CANCIONES"));
-    dlg.decir([t.recuerdo]);
+    dlg.decir(Array.isArray(t.recuerdo) ? t.recuerdo : [t.recuerdo]);
   }
   bPrev.addEventListener("click", () => { Sonido.sfx("click"); mostrar(actual - 1); });
   bNext.addEventListener("click", () => { Sonido.sfx("click"); mostrar(actual + 1); });
@@ -1883,7 +1989,7 @@ function renderBanda(c) {
     } else if (t.spotify || t.youtube || t.apple) {
       window.open(t.spotify || t.youtube || t.apple, "_blank", "noopener");
     } else {
-      mostrarToast("🎵", "Sin enlace todavía", "Agrégalo en CANCIONES (game.js)");
+      mostrarToast("🎵", t.titulo, "de " + t.artista + " · búscala en tu plataforma de música");
     }
   });
 
