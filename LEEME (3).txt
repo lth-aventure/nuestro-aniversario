@@ -1,0 +1,2 @@
+OBJETOS DE RECUERDO (PNG cuadrado)
+  colegio.png   -> objeto de la escena "Colegio" (una nota, un cuaderno, una entrada...)

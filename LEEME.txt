@@ -1,0 +1,7 @@
+ILUSTRACIONES DE ZONAS Y LUGARES (pixel-art o dibujos, PNG; proporción recomendada 5:3, p. ej. 500x300)
+  colegio.png            -> escena "Colegio"
+  primeros-meses.png     -> escena "Primeros meses"
+  universidad.png        -> escena "Universidad" (pestaña Ahora)
+  proxima-ruta.png       -> escena "Próxima ruta"
+  lugar1.png, lugar2.png ... -> uno por cada lugar del array LUGARES (game.js)
+Los nombres deben coincidir EXACTO (minúsculas, sin espacios): GitHub Pages distingue mayúsculas.

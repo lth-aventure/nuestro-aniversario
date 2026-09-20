@@ -1,0 +1,2 @@
+CARPETA RESERVADA PARA MAPAS PROPIOS
+El mapa principal se dibuja automáticamente con código, así que no necesitas poner nada aquí.

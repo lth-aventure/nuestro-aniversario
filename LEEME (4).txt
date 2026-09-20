@@ -1,0 +1,5 @@
+SPRITES DE LOS PERSONAJES
+Coloca aquí (PNG con fondo transparente, mirando al frente, 32x32 o 48x48 px recomendado):
+  yo.png
+  pareja.png
+Si no existen, el juego usa personajes pixel-art automáticos (colores en PERSONAJES, game.js).

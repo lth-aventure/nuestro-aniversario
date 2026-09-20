@@ -1,0 +1,5 @@
+MÚSICA DE FONDO (OPCIONAL)
+NO pongas canciones con copyright. Si tienes música libre de derechos o propia, guárdala aquí
+(p. ej. fondo.mp3) y escribe la ruta en CONFIG.musicaFondo (game.js).
+Si lo dejas vacío, el juego genera una melodía suave original con el navegador.
+Para las canciones de "Banda sonora" usa enlaces legales (Spotify / YouTube / Apple Music) en CANCIONES.

@@ -1,0 +1,5 @@
+FOTOGRAFÍAS (PNG o JPG; se muestran como fotos "polaroid" cuadradas)
+  foto-colegio.png
+  foto-primeros-meses.png
+  universidad-1.png
+Para usar .jpg, cambia la ruta correspondiente en la sección PERSONALIZACIÓN de game.js.

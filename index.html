@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <!-- viewport-fit=cover: aprovecha toda la pantalla del celular (incluida la zona del notch) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2a1b33">
+  <title>Nuestra aventura</title>
+
+  <!-- Tipografías pixel-art (Google Fonts). Si no hay internet, el juego usa fuentes de respaldo. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Todo el juego vive dentro de #juego. Las "pantallas" se muestran de una en una. -->
+<div id="juego">
+
+  <!-- ===== HUD: barra superior (visible en el mapa y en las escenas) ===== -->
+  <header class="hud" id="hud">
+    <button class="boton boton-mini hud-mochila" id="btn-mochila" data-accion="mochila" aria-label="Abrir mochila">
+      <span aria-hidden="true">🎒</span>
+      <span class="hud-etiqueta">RECUERDOS</span>
+      <span id="hud-contador">0/0</span>
+    </button>
+    <div class="hud-progreso" role="progressbar" aria-label="Aventura completada">
+      <span id="hud-progreso-texto">AVENTURA COMPLETADA: 0%</span>
+      <div class="barra"><div id="hud-barra-relleno" class="barra-relleno"></div></div>
+    </div>
+    <div class="hud-sonido">
+      <button class="boton boton-mini boton-icono" data-accion="efectos" aria-label="Efectos de sonido" aria-pressed="true">🔊</button>
+      <button class="boton boton-mini boton-icono" data-accion="musica" aria-label="Música" aria-pressed="true">🎵</button>
+    </div>
+  </header>
+
+  <main class="escenario">
+
+    <!-- ===== PANTALLA DE TÍTULO ===== -->
+    <section id="pantalla-titulo" class="pantalla activa">
+      <!-- Botones de sonido (arriba a la derecha) -->
+      <div class="titulo-sonido">
+        <button class="boton boton-mini boton-icono" data-accion="efectos" aria-label="Efectos de sonido" aria-pressed="true">🔊</button>
+        <button class="boton boton-mini boton-icono" data-accion="musica" aria-label="Música" aria-pressed="true">🎵</button>
+      </div>
+      <div class="titulo-marco">
+        <!-- Fondo pixel-art generado por JavaScript (game.js → Arte.titulo) -->
+        <canvas id="titulo-arte" class="titulo-arte" width="144" height="256"></canvas>
+        <div id="titulo-estrellas" class="titulo-estrellas" aria-hidden="true"></div>
+
+        <div class="titulo-contenido">
+          <div class="titulo-texto">
+            <p class="titulo-superior" id="titulo-superior">NUEVA AVENTURA</p>
+            <h1 class="titulo-nombres">
+              <span id="titulo-yo">TU NOMBRE</span>
+              <span class="titulo-mas" aria-hidden="true">+</span>
+              <span id="titulo-pareja">SU NOMBRE</span>
+            </h1>
+            <p class="titulo-sub" id="titulo-sub">1 AÑO JUNTOS</p>
+          </div>
+
+          <!-- Los dos personajes (sprites PNG si existen, si no, pixel-art automático) -->
+          <div class="titulo-personajes" id="titulo-personajes"></div>
+
+          <div class="titulo-botones">
+            <button id="btn-comenzar" class="boton boton-grande boton-oro" disabled>CARGANDO...</button>
+            <button id="btn-nueva" class="boton boton-mini" hidden>NUEVA AVENTURA</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MAPA PRINCIPAL ===== -->
+    <section id="pantalla-mapa" class="pantalla">
+      <div class="mapa-layout">
+        <div class="mapa-area">
+          <div class="mapa-marco" id="mapa-marco">
+            <!-- Mapa dibujado con JavaScript: 20x20 casillas de 16 px -->
+            <canvas id="mapa-canvas" width="320" height="320"></canvas>
+            <!-- Niebla que cubre la PRÓXIMA RUTA hasta que se desbloquea -->
+            <div id="mapa-niebla" class="niebla" aria-hidden="true"><i></i><i></i><i></i></div>
+            <!-- Botones de cada zona (los crea game.js) -->
+            <div id="mapa-zonas"></div>
+            <!-- Los dos personajes caminando por el mapa -->
+            <div id="mapa-personajes"></div>
+          </div>
+        </div>
+        <div class="dialogo caja dialogo-mapa" id="mapa-dialogo">
+          <p class="dialogo-texto"></p>
+          <span class="dialogo-flecha">▼</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ESCENA DE UNA ZONA (la construye game.js según la zona elegida) ===== -->
+    <section id="pantalla-escena" class="pantalla"></section>
+
+    <!-- ===== PANTALLA FINAL ===== -->
+    <section id="pantalla-final" class="pantalla">
+      <div class="final-fondo"></div>
+      <div class="final-confeti" id="final-confeti" aria-hidden="true"></div>
+      <div class="final-contenido">
+        <h1 class="final-titulo" id="final-titulo">¡AVENTURA COMPLETADA!</h1>
+        <p class="final-sub" id="final-sub">1 AÑO JUNTOS</p>
+        <div class="medalla-caja">
+          <canvas id="medalla" class="medalla" width="48" height="64" role="img" aria-label="Medalla"></canvas>
+          <p class="medalla-texto" id="final-medalla-texto"></p>
+        </div>
+        <p class="final-stats" id="final-stats"></p>
+        <div id="final-dialogo-slot" hidden></div>
+        <div class="final-acciones" id="final-acciones"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== MOCHILA (inventario) ===== -->
+  <div id="mochila" class="modal" hidden>
+    <div class="modal-fondo" data-accion="cerrar-mochila"></div>
+    <div class="modal-caja caja" role="dialog" aria-label="Mochila de recuerdos">
+      <header class="modal-barra">
+        <h2>🎒 MOCHILA</h2>
+        <button class="boton boton-mini" data-accion="cerrar-mochila" aria-label="Cerrar">✕</button>
+      </header>
+      <p id="mochila-resumen" class="mochila-resumen"></p>
+      <div id="mochila-rejilla" class="rejilla"></div>
+      <div id="mochila-detalle" class="detalle"></div>
+    </div>
+  </div>
+
+  <!-- ===== AVISO: ¡Has encontrado un recuerdo! ===== -->
+  <div id="toast" class="toast caja" hidden role="status">
+    <span class="toast-icono"></span>
+    <div>
+      <p class="toast-titulo"></p>
+      <p class="toast-sub"></p>
+    </div>
+  </div>
+
+  <!-- ===== BANNER: ¡NUEVA RUTA DESBLOQUEADA! ===== -->
+  <div id="banner" class="banner" hidden>
+    <div class="banner-caja">
+      <p class="banner-l1"></p>
+      <p class="banner-l2"></p>
+    </div>
+  </div>
+
+  <!-- ===== TRANSICIÓN ENTRE ESCENAS (mosaico de píxeles) ===== -->
+  <div id="transicion" class="transicion" hidden aria-hidden="true">
+    <div class="tr-celdas"></div>
+    <p class="tr-titulo"></p>
+  </div>
+
+</div>
+
+<!-- Todo el código del juego, con la sección PERSONALIZACIÓN DEL REGALO al inicio -->
+<script src="game.js"></script>
+</body>
+</html>
